@@ -78,7 +78,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let mode=ls.get('p-mode','goods'),q=ls.get('p-q',''),region=ls.get('p-region',''),recent=ls.get('p-recent',[]),
-    src='all',sort='price',busy=false,data=null,err='';
+    src='all',sort=ls.get('p-sort','desc'),busy=false,data=null,err='';
 
 function won(n){return n.toLocaleString()+'원'}
 function safe(u){return typeof u==='string'&&u.startsWith('https://')?u:'#'}
@@ -107,16 +107,17 @@ function goodsView(){
   let items=allItems();
   const counts={};items.forEach(x=>counts[x.k]=(counts[x.k]||0)+1);
   if(src!=='all')items=items.filter(x=>x.k===src);
-  if(sort==='price')items.sort((a,b)=>a.p-b.p);
+  if(sort==='asc')items.sort((a,b)=>a.p-b.p);
+  else if(sort==='desc')items.sort((a,b)=>b.p-a.p);
   else items.sort((a,b)=>a.i-b.i||a.k.localeCompare(b.k));
   items=items.slice(0,60);
   const min=items.length?Math.min(...items.map(x=>x.p)):0;
   const miss=Object.entries(data.results).filter(([k,v])=>!v.ok||!v.items.length).map(([k])=>k);
   return`<div class="chips"><button class="chip ${src==='all'?'on':''}" data-src="all">전체 ${Object.values(counts).reduce((a,b)=>a+b,0)}</button>
     ${Object.keys(SRC).map(k=>`<button class="chip ${src===k?'on':''} ${counts[k]?'':'dim'}" data-src="${k}">${SRC[k].n} ${counts[k]||0}</button>`).join('')}</div>
-    <div class="row" style="margin-top:6px;padding:10px 14px"><span class="small">${new Date(data.at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 조회 · 어림값</span>
-      <button class="chip" data-sort="${sort==='price'?'rel':'price'}">${sort==='price'?'낮은 가격순':'검색 순서'} ⇅</button></div>
-    ${sort==='price'?`<div class="warn">가장 싼 건 부품·한쪽 유닛·고장품일 수 있어요. 제목을 꼭 확인하세요.</div>`:''}
+    <div class="row" style="margin-top:6px;padding:10px 14px;flex-wrap:wrap;gap:8px"><span class="small">${new Date(data.at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 조회 · 어림값</span>
+      <span>${[['desc','높은 가격순'],['asc','낮은 가격순'],['rel','검색 순서']].map(([k,l])=>`<button class="chip ${sort===k?'on':''}" data-sort="${k}">${l}</button>`).join(' ')}</span></div>
+    ${sort==='asc'?`<div class="warn">가장 싼 건 부품·한쪽 유닛·고장품일 수 있어요. 제목을 꼭 확인하세요.</div>`:''}
     ${items.map(x=>`<a class="card" href="${esc(safe(x.u))}" target="_blank" rel="noopener noreferrer">
       ${x.i?`<img src="${esc(x.i)}" loading="lazy" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=ph></div>'">`:'<div class="ph"></div>'}
       <div class="b"><div class="t">${esc(x.t)}</div><div><span class="p">${won(x.p)}</span>${x.p===min&&items.length>1?'<span class="low">최저</span>':''}</div>
@@ -146,7 +147,7 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('[data-mode],[data-src],[data-sort],[data-recent]');if(!t)return;
   if(t.dataset.mode){mode=t.dataset.mode;ls.set('p-mode',mode);q=$('#q').value.trim();render()}
   else if(t.dataset.src){src=t.dataset.src;render()}
-  else if(t.dataset.sort){sort=t.dataset.sort;render()}
+  else if(t.dataset.sort){sort=t.dataset.sort;ls.set('p-sort',sort);render()}
   else if(t.dataset.recent){q=t.dataset.recent;render();search()}
 });
 render();
