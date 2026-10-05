@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0b0e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="최저가">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.png">
+<title>최저가</title>
+<style>
+:root{--bg:#0b0b0e;--card:#17171c;--text:#fff;--sub:#9aa0aa;--line:#25252c;--acc:#ff8a4c;--acc-t:rgba(255,138,76,.14);--acc-b:rgba(255,138,76,.32);--gray-t:rgba(154,160,170,.16)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);color-scheme:dark;
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;-webkit-font-smoothing:antialiased;touch-action:manipulation}
+#app{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 16px) 16px calc(40px + env(safe-area-inset-bottom))}
+button,input{font:inherit;color:inherit}button{border:0;background:none;cursor:pointer;padding:0}
+a{color:inherit;text-decoration:none}
+.top{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 14px}
+.top h1{font-size:24px;font-weight:800;letter-spacing:-.5px;margin:0}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:3px}
+.seg button{padding:8px 14px;border-radius:11px;font-size:14px;font-weight:700;color:var(--sub);transition:background .15s,color .15s}
+.seg button.on{background:var(--acc-t);color:var(--acc)}
+.search{display:flex;gap:8px}
+.search input{flex:1;min-width:0;padding:15px 16px;border-radius:16px;border:1px solid var(--line);background:var(--card);font-size:17px;outline:none}
+.search input:focus{border-color:var(--acc-b)}
+.go{padding:0 18px;border-radius:16px;background:var(--acc-t);color:var(--acc);border:1px solid var(--acc-b);font-weight:800;font-size:15px}
+.go:active{transform:scale(.96)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px}
+.chip{display:inline-block;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:600;background:var(--gray-t);color:var(--sub)}
+.chip.on{background:var(--acc-t);color:var(--acc)}.chip.dim{opacity:.55}
+.small{font-size:12px;color:var(--sub);line-height:1.5}
+.card{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;margin-top:10px;animation:in .25s ease both}
+.card img,.card .ph{width:84px;height:84px;border-radius:12px;object-fit:cover;background:var(--gray-t);flex:none}
+.card .b{min-width:0;display:flex;flex-direction:column;justify-content:space-between;flex:1}
+.card .t{font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .p{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.card .low{font-size:11px;color:var(--acc);font-weight:700;margin-left:6px}
+.tag{display:inline-block;font-size:11px;padding:3px 7px;border-radius:6px;background:var(--gray-t);color:var(--sub);margin-right:4px}
+.tag.used{background:var(--acc-t);color:var(--acc)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sk{height:108px;border-radius:18px;margin-top:10px;background:linear-gradient(90deg,var(--card) 25%,#202027 50%,var(--card) 75%);background-size:200% 100%;animation:sh 1.2s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.card,.sk{animation:none}}
+.row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:8px}
+.row b{font-size:16px}.row .small{display:block;margin-top:2px}.row .go2{color:var(--acc);font-weight:700;font-size:14px}
+.row.off{opacity:.45;pointer-events:none}
+h3{font-size:13px;color:var(--sub);font-weight:700;margin:22px 4px 2px;letter-spacing:.5px}
+.warn{background:var(--acc-t);border:1px solid var(--acc-b);color:var(--acc);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5;margin-top:12px}
+.miss{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:12px 14px;border-radius:14px;border:1px dashed var(--line);font-size:13px;color:var(--sub)}
+.miss a{color:var(--acc);font-weight:700}
+.foot{margin:28px 4px 0;color:var(--sub);font-size:11.5px;line-height:1.6}
+details{margin-top:10px}summary{list-style:none;cursor:pointer;color:var(--sub);font-size:13px}summary::-webkit-details-marker{display:none}
+.region{width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);outline:none;font-size:15px}
+.empty{text-align:center;color:var(--sub);padding:50px 0;line-height:1.7}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const API='https://price-hub.timetable-app.workers.dev';
+const SRC={
+  coupang:{n:'쿠팡',used:0,site:q=>`https://www.coupang.com/np/search?q=${q}`},
+  danawa:{n:'다나와',used:0,site:q=>`https://search.danawa.com/dsearch.php?query=${q}`},
+  daangn:{n:'당근',used:1,site:q=>`https://www.daangn.com/kr/search/buy-sell/?q=${q}`},
+  bunjang:{n:'번개장터',used:1,site:q=>`https://m.bunjang.co.kr/search/products?q=${q}`}
+};
+// 옷 모드: 가격을 가져오지 않고 각 플랫폼 검색 결과로 바로 보낸다
+const CLOTH=[
+  ['종합',[['네이버 쇼핑','스마트스토어 입점 업체 전체',q=>`https://search.shopping.naver.com/search/all?query=${q}`],['쿠팡','로켓배송·마켓플레이스',q=>`https://www.coupang.com/np/search?q=${q}`]]],
+  ['패션 플랫폼',[['무신사','브랜드·편집',q=>`https://www.musinsa.com/search/goods?keyword=${q}`],['29CM','감도 높은 편집',q=>`https://www.29cm.co.kr/store/search?keyword=${q}`],['W컨셉','디자이너·여성',q=>`https://display.wconcept.co.kr/search?keyword=${q}`],['지그재그','쇼핑몰 모음',q=>`https://zigzag.kr/search?keyword=${q}`],['4910','스트리트·브랜드',q=>`https://4910.kr/search?keyword=${q}`]]],
+  ['리셀 · 중고',[['크림','한정판 거래 시세',q=>`https://kream.co.kr/search?keyword=${q}`],['번개장터','중고·빈티지',q=>`https://m.bunjang.co.kr/search/products?q=${q}`],['당근','동네 중고',q=>`https://www.daangn.com/kr/search/buy-sell/?q=${q}`]]]
+];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let mode=ls.get('p-mode','goods'),q=ls.get('p-q',''),region=ls.get('p-region',''),recent=ls.get('p-recent',[]),
+    src='all',sort='price',busy=false,data=null,err='';
+
+function won(n){return n.toLocaleString()+'원'}
+function safe(u){return typeof u==='string'&&u.startsWith('https://')?u:'#'}
+function allItems(){
+  const out=[];for(const [k,v] of Object.entries(data.results))if(v.ok)for(const [i,x] of v.items.entries())out.push({...x,k,i,used:SRC[k].used});
+  return out}
+
+async function search(){
+  q=$('#q').value.trim();ls.set('p-q',q);
+  if(q.length<2){err='검색어를 두 글자 이상 입력해 주세요';render();return}
+  recent=[q,...recent.filter(x=>x!==q)].slice(0,6);ls.set('p-recent',recent);
+  if(mode==='cloth'){err='';render();return}
+  busy=true;err='';data=null;src='all';render();
+  try{
+    const r=await fetch(`${API}/api/search?q=${encodeURIComponent(q)}&region=${encodeURIComponent(region)}`);
+    if(r.status===429)throw new Error('잠깐만요, 너무 자주 검색했어요. 1분 뒤에 다시 해 주세요');
+    if(!r.ok)throw new Error('서버에 연결하지 못했어요');
+    data=await r.json()
+  }catch(e){err=e.message||'검색에 실패했어요'}
+  busy=false;render()}
+
+function goodsView(){
+  if(busy)return`<div class="sk"></div><div class="sk"></div><div class="sk"></div>`;
+  if(err)return`<div class="empty">${esc(err)}</div>`;
+  if(!data)return`<div class="empty">사고 싶은 물건을 검색해 보세요<br>쿠팡 · 다나와 · 당근 · 번개장터를 한 번에 찾아요</div>`;
+  let items=allItems();
+  const counts={};items.forEach(x=>counts[x.k]=(counts[x.k]||0)+1);
+  if(src!=='all')items=items.filter(x=>x.k===src);
+  if(sort==='price')items.sort((a,b)=>a.p-b.p);
+  else items.sort((a,b)=>a.i-b.i||a.k.localeCompare(b.k));
+  items=items.slice(0,60);
+  const min=items.length?Math.min(...items.map(x=>x.p)):0;
+  const miss=Object.entries(data.results).filter(([k,v])=>!v.ok||!v.items.length).map(([k])=>k);
+  return`<div class="chips"><button class="chip ${src==='all'?'on':''}" data-src="all">전체 ${Object.values(counts).reduce((a,b)=>a+b,0)}</button>
+    ${Object.keys(SRC).map(k=>`<button class="chip ${src===k?'on':''} ${counts[k]?'':'dim'}" data-src="${k}">${SRC[k].n} ${counts[k]||0}</button>`).join('')}</div>
+    <div class="row" style="margin-top:6px;padding:10px 14px"><span class="small">${new Date(data.at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 조회 · 어림값</span>
+      <button class="chip" data-sort="${sort==='price'?'rel':'price'}">${sort==='price'?'낮은 가격순':'검색 순서'} ⇅</button></div>
+    ${sort==='price'?`<div class="warn">가장 싼 건 부품·한쪽 유닛·고장품일 수 있어요. 제목을 꼭 확인하세요.</div>`:''}
+    ${items.map(x=>`<a class="card" href="${esc(safe(x.u))}" target="_blank" rel="noopener noreferrer">
+      ${x.i?`<img src="${esc(x.i)}" loading="lazy" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=ph></div>'">`:'<div class="ph"></div>'}
+      <div class="b"><div class="t">${esc(x.t)}</div><div><span class="p">${won(x.p)}</span>${x.p===min&&items.length>1?'<span class="low">최저</span>':''}</div>
+      <div><span class="tag ${x.used?'used':''}">${x.used?'중고':'새 상품'}</span><span class="tag">${esc(x.m)}</span>${x.s?`<span class="tag">${esc(x.s)}</span>`:''}</div></div></a>`).join('')}
+    ${miss.map(k=>`<div class="miss"><span>${SRC[k].n} 결과가 없거나 못 가져왔어요</span><a href="${esc(SRC[k].site(encodeURIComponent(q)))}" target="_blank" rel="noopener noreferrer">직접 보기 ↗</a></div>`).join('')}`}
+
+function clothView(){
+  const on=q.length>=2,eq=encodeURIComponent(q);
+  return`<div id="cv">${clothInner()}</div>`}
+function clothInner(){
+  const on=q.length>=2,eq=encodeURIComponent(q);
+  return`<div class="small" style="margin:12px 4px 0">${on?`"${esc(q)}"를 플랫폼별로 검색해요. 누르면 해당 사이트 검색 결과가 열려요.`:'검색어를 입력하면 아래 플랫폼 검색으로 바로 연결돼요.'}</div>
+  ${CLOTH.map(([g,list])=>`<h3>${g}</h3>${list.map(([n,d,f])=>`<a class="row ${on?'':'off'}" href="${on?esc(f(eq)):'#'}" target="_blank" rel="noopener noreferrer"><div><b>${n}</b><span class="small">${d}</span></div><span class="go2">검색 ↗</span></a>`).join('')}`).join('')}`}
+
+function render(){
+  $('#app').innerHTML=`<div class="top"><h1>최저가</h1><div class="seg"><button class="${mode==='goods'?'on':''}" data-mode="goods">생활용품</button><button class="${mode==='cloth'?'on':''}" data-mode="cloth">옷</button></div></div>
+  <form class="search" id="f"><input id="q" type="search" enterkeyhint="search" placeholder="${mode==='goods'?'예: 에어팟 프로, 다이슨 청소기':'예: 나이키 에어포스, 아디다스 트랙탑'}" value="${esc(q)}" autocomplete="off"><button class="go" type="submit">검색</button></form>
+  ${recent.length?`<div class="chips" style="margin-top:10px">${recent.map(r=>`<button class="chip" data-recent="${esc(r)}">${esc(r)}</button>`).join('')}</div>`:''}
+  ${mode==='goods'?`<details ${region?'':''}><summary>📍 내 동네${region?': '+esc(region):''} (당근 검색용)</summary><input class="region" id="region" placeholder="예: 합정동" value="${esc(region)}"></details>`:''}
+  ${mode==='goods'?goodsView():clothView()}
+  <div class="foot">가격은 조회 시점 기준 어림값이에요. 구매 전 판매처에서 꼭 확인하세요. 쿠팡 링크는 제휴 링크라서 구매하면 앱 운영 서비스에 수수료가 갈 수 있어요.</div>`;
+  $('#f').onsubmit=e=>{e.preventDefault();search()};
+  const rg=$('#region');if(rg)rg.onchange=()=>{region=rg.value.trim();ls.set('p-region',region);render()};
+  const qi=$('#q');if(mode==='cloth')qi.oninput=()=>{q=qi.value.trim();ls.set('p-q',q);$('#cv').innerHTML=clothInner()};
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-mode],[data-src],[data-sort],[data-recent]');if(!t)return;
+  if(t.dataset.mode){mode=t.dataset.mode;ls.set('p-mode',mode);q=$('#q').value.trim();render()}
+  else if(t.dataset.src){src=t.dataset.src;render()}
+  else if(t.dataset.sort){sort=t.dataset.sort;render()}
+  else if(t.dataset.recent){q=t.dataset.recent;render();search()}
+});
+render();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
